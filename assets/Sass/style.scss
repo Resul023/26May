@@ -1,0 +1,28 @@
+#load{
+    width: 10%;
+    margin: 0 auto;
+    height: 60px;
+
+}
+
+img{
+    height: 250px;
+}
+
+.form-icon{
+    position: relative;
+    display: flex;
+    align-items: center;
+
+    i{
+        font-size: 25px;
+        margin-left: 15px;
+        cursor: pointer;
+    }
+    span{
+        position: absolute;
+        right: -8px;
+        top: -8px;
+        font-size: 17px;
+    }
+}
