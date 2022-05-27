@@ -30,4 +30,10 @@ img {
   top: -8px;
   font-size: 17px;
 }
+
+.form-icon ul {
+  position: absolute;
+  top: 40px;
+  z-index: 1;
+}
 /*# sourceMappingURL=style.css.map */

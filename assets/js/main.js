@@ -1,22 +1,31 @@
 let loadBtn = document.querySelector('#load')
-
 let addCard = document.querySelector('#cardAdd')
-
-
-
-function products(proid,procount){
-    this.Id = proid;
-    this.Count = procount;
-}
-
 let page = 1;
 load(page)
+
+// function products(proid,procount){
+//     this.Id = proid;
+//     this.Count = procount;
+// } this func for btn
+
+let basketitemStr = localStorage.getItem('basket');
+let basket;
+
+if(!basketitemStr){
+    basket=[];
+}
+else{
+    basket= JSON.parse(basketitemStr)    
+        
+}
+let wishCount = document.getElementById('wishCount')
+wishCount.innerText = basket.length; 
+
 loadBtn.addEventListener('click',function(){
     
     page++;
     load(page)
 })
-
 
 function load(page){
 
@@ -24,7 +33,8 @@ function load(page){
         .then(response=>response.json())
         .then(data=>{
             data.products.forEach(post => {
-                // console.log(post);
+
+                let isAdded = basket.some(x=>x==post.id)
                 let card =
                  `<div class="card" style="width: 18rem;">
                 <img src="${post.images[0]}" class="card-img-top" alt="...">
@@ -32,47 +42,42 @@ function load(page){
                   <h5 class="card-title">${post.title}</h5>
                   <p class="card-text">${post.price}</p>
                   <p class="card-text">id:${post.id}</p>
-                  <a href="#" class="btn btn-primary btnId" data-id='${post.id}'>Go somewhere</a>
-                  <i class="fa-regular fa-heart" style="font-size: 20px;"></i>
+                  <a href="#" class="btn btn-primary btnId" >Go somewhere</a>
+                  <i class="fa-${isAdded?"solid":"regular"} fa-heart wish-list" style="font-size: 20px; cursor: pointer; color:${isAdded?"red":"black"}" data-id='${post.id}'></i>
                 </div>
               </div>`
               addCard.innerHTML += card
             });
         })
-        .then(function(){
-            let cardbtn = document.querySelectorAll('.btnId')
+        .then(()=>{
+            let wishList = document.querySelectorAll('.wish-list')
 
-            cardbtn.forEach(card =>{
+            wishList.forEach(wishItem =>{
                 
-                card.addEventListener('click',function(e){
-                    e.preventDefault();
-                    let cardId = card.getAttribute('data-id')
+                wishItem.addEventListener('click',function(e){
                     
-                    let basketitemStr = localStorage.getItem('basket');
-                    let basket;
+                    let wistId = wishItem.getAttribute('data-id')
 
-                    if(!basketitemStr){
-                        basket=[];
+
+                    let itemIndex = basket.indexOf(wistId)
+
+                    if(itemIndex == -1){
+                        basket.push(wistId)
+                        this.classList.remove('fa-regular')
+                        this.classList.add('fa-solid')
+                        this.style.color='red'
                     }
                     else{
-                        basket= JSON.parse(basketitemStr)           
-                    }
-
-                    let product= basket.find(x=>x.Id == cardId)
-
-                    if(product){
-                        product.Count++;
-                    }
-                    else{
-                     product = new products(cardId,1)
-                     basket.push(product)
+                     basket.splice(itemIndex,1)
+                     this.classList.remove('fa-solid')
+                     this.classList.add('fa-regular')
+                     this.style.color='black'
 
                     }
-                    let span = document.querySelector('.proCount')
-                    span.innerText = basket.length;
+                    
                     localStorage.setItem('basket',JSON.stringify(basket))
-
-                   
+                    wishCount.innerText = basket.length;
+                    
 
                 })
                 
@@ -82,7 +87,31 @@ function load(page){
 
         })
 }
+ let input = document.getElementById('getInput')
+ let listItem = document.querySelector('.list-group')
+ input.addEventListener('input',function(){
+   
+    if(input.value ){
+        fetch(`https://dummyjson.com/products/search?q=${input.value}`)
+        .then(response=>response.json())
+        .then(data=>{
+            
+            data.products.forEach(x=>{
+                console.log(x);
+                let li = document.createElement('li')
+                li.classList.add('list-group-item')
+                li.innerText=x.title;
+                listItem.appendChild(li)
+                
+            })
+            
+        })
+    }else{
+        listItem.innerHTML='';
+    }
+   
 
+ })
 
 
 
